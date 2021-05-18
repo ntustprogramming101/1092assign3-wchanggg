@@ -4,17 +4,35 @@ int block=80;
 int groundhogIdleX = block*4;
 int groundhogIdleY = block ;
 
+float groundhogSpeed = 4;
+float groundhogX; 
+float groundhogY;
+float groundhogWidth = 80;
+float groundhogHeight = 80;
+
+int down = 0;
+int right = 0;
+int left = 0;
+float step = 80.0;
+int frames = 15;
+int floorSpeed = 0;
+float downMove = 0;
+
 final int GRASS_HEIGHT = 15;
 final int START_BUTTON_W = 144;
 final int START_BUTTON_H = 60;
 final int START_BUTTON_X = 248;
 final int START_BUTTON_Y = 360;
 
-PImage title, gameover, groundhogIdle, startNormal, startHovered, restartNormal, restartHovered;
+PImage title, gameover, groundhogIdle, groundhogDown, groundhogLeft, groundhogRight, startNormal, startHovered, restartNormal, restartHovered;
 PImage bg, life, soil0, soil1, soil2, soil3, soil4, soil5, stone1, stone2;
 
 int button_L = 248, button_R = 248+144;
 int button_T = 360, button_D = 360+60;
+
+boolean downPressed  = false;
+boolean leftPressed  = false;
+boolean rightPressed  = false;
 
 // For debug function; DO NOT edit or remove this!
 int playerHealth = 0;
@@ -34,6 +52,9 @@ void setup() {
 	restartHovered = loadImage("img/restartHovered.png");
   life = loadImage ("img/life.png");
   groundhogIdle = loadImage("img/groundhogIdle.png");
+  groundhogDown = loadImage("img/groundhogDown.png");
+  groundhogLeft = loadImage("img/groundhogLeft.png");
+  groundhogRight = loadImage("img/groundhogRight.png");
 
   soil0 = loadImage("img/soil0.png");
   soil1 = loadImage("img/soil1.png");
@@ -43,6 +64,10 @@ void setup() {
   soil5 = loadImage("img/soil5.png");
   stone1 = loadImage("img/stone1.png");
   stone2 = loadImage("img/stone2.png");
+  
+  //groundhogPosition
+  groundhogX = groundhogIdleX;
+  groundhogY = groundhogIdleY;
 }
 
 void draw() {
@@ -102,91 +127,144 @@ void draw() {
      //1-4 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil0, x*block, y*block + block*2);
+      image(soil0, x*block, y*block + downMove + block*2);
       }}
      //5-8 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil1, x*block,  y*block + block*6);
+      image(soil1, x*block,  y*block + downMove + block*6);
       }}
      //9-12 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil2, x*block,  y*block + block*10);
+      image(soil2, x*block,  y*block + downMove + block*10);
       }}
      //13-16 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil3, x*block,  y*block + block*14);
+      image(soil3, x*block,  y*block + downMove + block*14);
       }}
      //17-20 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil4, x*block,  y*block + block*18);
+      image(soil4, x*block,  y*block + downMove + block*18);
       }}
      //21-24 soil
     for (int x = 0; x < 8; x++){  
       for (int y = 0; y < 4; y++){
-      image(soil5, x*block,  y*block + block*22);
+      image(soil5, x*block,  y*block + downMove + block*22);
       }}
       
     //stone 1-8
     for (int i = 0; i < 8; i++){
-      image(stone1, i*block, i*block + block*2);
+      image(stone1, i*block, i*block + downMove + block*2);
     }
     //stone 9-16
     //case1
     for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==0 || x==3 || x==4 || x==7 ) && ( y==1 || y==2 || y==5 || y==6 )) {
-      image(stone1, x*block, y*block + block*2 + 4*2*block);
+      image(stone1, x*block, y*block + block*2 + downMove + 4*2*block);
     }}}
     //case2
     for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==1 || x==2 || x==5 || x==6 ) && ( y==0 || y==3 || y==4 || y==7 )) {
-      image(stone1, x*block, y*block + block*2 + 4*2*block);
+      image(stone1, x*block, y*block + block*2 + downMove + 4*2*block);
     }}}
     //stone 17-24
       //stone1_case1
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==1 || x==2 || x==4 || x==5 || x==7 ) && ( y==0 || y==3 || y==6 )) {
-      image(stone1, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone1, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
     //stone1_case2
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==0 || x==1 || x==3 || x==4 || x==6 || x==7 ) && ( y==1 || y==4 || y==7 )) {
-      image(stone1, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone1, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
     //stone1_case3
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==0 || x==2 || x==3 || x==5 || x==6 ) && ( y==2 || y==5 )) {
-      image(stone1, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone1, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
     
     //stone2_case1
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==2 || x==5 ) && ( y==0 || y==3 || y==6 )) {
-      image(stone2, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone2, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
      //stone2_case2
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==1 || x==4 || x==7 ) && ( y==1 || y==4 || y==7 )) {
-      image(stone2, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone2, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
      //stone2_case3
       for (int x = 0; x < 8; x++){
       for(int y=0; y<8; y++){
       if(( x==0 || x==3 || x==6 ) && ( y==2 || y==5 )) {
-      image(stone2, x*block, y*block + block*2 + 4*2*2*block);
+      image(stone2, x*block, y*block + block*2 + downMove + 4*2*2*block);
     }}}
    
 		// Player
+//groundhog move
+    //down
+    if (down > 0 && downMove > -1600) {
+      floorSpeed -=1;
+      if (down == 1) {
+        downMove = round(step/frames*floorSpeed);
+        image(groundhogIdle, groundhogX, groundhogY);
+      } else {
+        downMove = step/frames*floorSpeed;
+        image(groundhogDown, groundhogX, groundhogY);
+      }
+      down -=1;
+    }
+
+    if (down > 0 && downMove == -1600) {
+      if (down == 1) {
+        groundhogY = round(groundhogY + step/frames);
+        image(groundhogIdle, groundhogX, groundhogY);
+      } else {
+        groundhogY = groundhogY + step/frames;
+        image(groundhogDown, groundhogX, groundhogY);
+      }
+      down -=1;
+    }
+
+    //left
+    if (left > 0) {
+      if (left == 1) {
+        groundhogX = round(groundhogX - step/frames);
+        image(groundhogIdle, groundhogX, groundhogY);
+      } else {
+        groundhogX = groundhogX - step/frames;
+        image(groundhogLeft, groundhogX, groundhogY);
+      }
+      left -=1;
+    }
+
+    //right
+    if (right > 0) {
+      if (right == 1) {
+        groundhogX = round(groundhogX + step/frames);
+        image(groundhogIdle, groundhogX, groundhogY);
+      } else {
+        groundhogX = groundhogX + step/frames;
+        image(groundhogRight, groundhogX, groundhogY);
+      }
+      right -=1;
+    }
+
+    //no move
+    if (down == 0 && left == 0 && right == 0 ) {
+      image(groundhogIdle, groundhogX, groundhogY);
+    }
 
 		// Health UI
     for(int i=0 ;  i< playerHealth; i++){
@@ -206,13 +284,20 @@ void draw() {
            image( restartHovered, 248, 360); 
            if(mousePressed){
              gameState = GAME_RUN;
-           }}
-      //initial life and groundhog
-      playerHealth = 2;
-      
-		break;
-		
-	}
+                   //initial life and groundhog
+        mousePressed = false;        
+        down = 0;
+        left = 0;
+        right = 0;
+        playerHealth=2;
+      }
+    } else {
+      image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
+    }
+    break;
+  }
+           
+     
 
     // DO NOT REMOVE OR EDIT THE FOLLOWING 3 LINES
     if (debugMode) {
@@ -222,6 +307,31 @@ void draw() {
 
 void keyPressed(){
 	// Add your moving input code here
+if (down>0 || left>0 || right>0) {
+    return;
+  }
+  if (key == CODED) {
+    switch(keyCode) {
+    case DOWN:
+      if (groundhogY < 400) {
+        downPressed = true;
+        down = 15;
+      }
+      break;
+    case LEFT:
+      if (groundhogX > 0) {
+        leftPressed = true;
+        left = 15;
+      }
+      break;
+    case RIGHT:
+      if (groundhogX < 560) {
+        rightPressed = true;
+        right = 15;
+      }
+      break;
+    }
+  }
 
 	// DO NOT REMOVE OR EDIT THE FOLLOWING SWITCH/CASES
     switch(key){
