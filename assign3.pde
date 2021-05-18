@@ -289,7 +289,11 @@ void draw() {
         down = 0;
         left = 0;
         right = 0;
-        playerHealth=2;
+        playerHealth=2;         
+	downMove = 0;
+	groundhogX = groundhogIdleX;
+        groundhogY = groundhogIdleY;
+
       }
     } else {
       image(restartNormal, START_BUTTON_X, START_BUTTON_Y);
